@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:testai/model/data/user_data.dart';
 import 'package:testai/model/user.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:voice_search/voice_search.dart';
 
 class HomeView extends StatefulWidget {
@@ -19,22 +20,29 @@ class _HomeViewState extends State<HomeView> {
     super.initState();
     filteredItems = users;
   }
-  void _filterList(String query) {
+  void _filterList(String query) async {
     setState(() {
-      // Split the query into individual keywords by spaces
       List<String> keywords = query.toLowerCase().split(' ');
 
-      // Filter the users list based on the presence of any relevant keyword in the fullInfo string
       filteredItems = users.where((user) {
         String fullInfoLower = user.fullInfo.toLowerCase();
-
-        // Check if any relevant keyword is contained in the fullInfo string
         return keywords.any((keyword) => fullInfoLower.contains(keyword));
       }).toList();
+
+      // If the query contains the word "call", initiate the call
+      if (keywords.contains('call') && filteredItems.isNotEmpty) {
+        _makePhoneCall(filteredItems.first.phone);
+      }
     });
   }
 
-
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    await launchUrl(launchUri);
+  }
 
   @override
   Widget build(BuildContext context) {
