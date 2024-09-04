@@ -24,22 +24,55 @@ class _HomeViewState extends State<HomeView> {
           .toList();
     });
   }
+  final TextEditingController _controller = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
     appBar: AppBar(
       title: Text('Searchable List'),
       actions: [
-        VoiceSearchWidget(
-          onResult: _filterList,
-        ),
+        // VoiceSearchWidget(
+        //   onResult: _filterList,
+        // ),
       ],
     ),
-    body: ListView.builder(
-      itemCount: filteredItems.length,
-      itemBuilder: (context, index) {
-        return ListTile(title: Text(filteredItems[index]));
-      },
+    body: Column(
+      children: [
+    Padding(
+    padding: EdgeInsets.all(16.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              decoration: InputDecoration(
+                hintText: 'Search...',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
+          SizedBox(width: 10),
+          VoiceSearchWidget(
+            onResult: (String result) {
+              _controller.text = result;
+              _filterList(result);
+              // Perform search with result
+            },
+          ),
+        ],
+      ),
+    ),
+
+        Expanded(
+          child: ListView.builder(
+            itemCount: filteredItems.length,
+            itemBuilder: (context, index) {
+              return ListTile(title: Text(filteredItems[index]));
+            },
+          ),
+        ),
+      ],
     ),
     );;
   }
