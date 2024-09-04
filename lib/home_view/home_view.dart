@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:testai/home_view/view/voice_view.dart';
 import 'package:testai/model/data/user_data.dart';
 import 'package:testai/model/user.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -49,6 +50,11 @@ class _HomeViewState extends State<HomeView> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Searchable List'),
+        actions: [
+          IconButton(onPressed: (){
+            // Navigator.push(context, MaterialPageRoute(builder: (_)=>MyHomePage()));
+          }, icon: Icon(Icons.arrow_forward_ios))
+        ],
       ),
       body: Column(
         children: [

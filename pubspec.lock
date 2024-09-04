@@ -190,7 +190,7 @@ packages:
     source: hosted
     version: "1.10.0"
   speech_to_text:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: speech_to_text
       sha256: "97425fd8cc60424061a0584b6c418c0eedab5201cc5e96ef15a946d7fab7b9b7"
