@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:testai/home_view/home_view.dart';
+import 'package:testai/home_view/view/voice_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const HomeView()
+      home: const MyHomePage()
     );
   }
 }
