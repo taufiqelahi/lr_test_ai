@@ -52,7 +52,7 @@ class _HomeViewState extends State<HomeView> {
         title: Text('Searchable List'),
         actions: [
           IconButton(onPressed: (){
-            // Navigator.push(context, MaterialPageRoute(builder: (_)=>MyHomePage()));
+            Navigator.push(context, MaterialPageRoute(builder: (_)=>MyHomePage()));
           }, icon: Icon(Icons.arrow_forward_ios))
         ],
       ),
