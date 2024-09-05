@@ -111,7 +111,9 @@ class _ImageToTextState extends State<ImageToText> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               if (extractedInfo['Name'] != null)
-                                Text(" ${extractedInfo['Name']}"),
+                                Text("n ${extractedInfo['Name']}"),
+                              if (extractedInfo['Company'] != null)
+                                Text("c ${extractedInfo['Company']}"),
                               if (extractedInfo['Email'] != null)
                                 Text(" ${extractedInfo['Email']}"),
                               if (extractedInfo['Mobile'] != null)
@@ -148,6 +150,35 @@ class _ImageToTextState extends State<ImageToText> {
     final Map<String, String> extracted = {};
 
     // Regex for email
+
+    final lines = text.split('\n').map((line) => line.trim()).where((line) => line.isNotEmpty).toList();
+
+    // Extract company name (first line)
+    if (lines.isNotEmpty) {
+      extracted['Company'] = lines[0];
+    }
+
+
+    // Consider all lines after the designation as potential name lines
+    final nameRegex = RegExp(
+      r'^(?:Mr\.?|Mrs\.?|Ms\.?|Dr\.?|Md\.?)\s*[A-Za-z\s.]+(?:\s[A-Za-z\s.]+)*$',
+      multiLine: true,
+    );
+
+    // Find name in lines that are not likely to be contact info
+    final contactInfoPattern = RegExp(r'Tel|Mobile|Fax|E-mail|Global Dial|www');
+    final possibleNameLines = lines.where((line) => !contactInfoPattern.hasMatch(line)).toList();
+print("aaaaa${possibleNameLines}");
+    for (var line in possibleNameLines) {
+      final nameMatch = nameRegex.firstMatch(line);
+      print("baaaa${nameMatch}");
+      if (nameMatch != null) {
+        extracted['Name'] = nameMatch.group(0)?.trim() ?? '';
+        break; // Stop after finding the first valid name
+      }else{
+        extracted['Name'] = possibleNameLines[1];
+      }
+    }
     final emailRegex = RegExp(r'\b[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b');
     final emailMatch = emailRegex.firstMatch(text);
     if (emailMatch != null) {
@@ -182,15 +213,30 @@ class _ImageToTextState extends State<ImageToText> {
       if (mobiles.isNotEmpty) extracted['Mobile'] = mobiles.join(', ');
     }
     // Regex for name (you can fine-tune this for common name patterns)
-    final nameRegex = RegExp(
-      r'^(?:Mr\.?|Mrs\.?|Ms\.?|Dr\.?|Md\.?)?\s*[A-Za-z.]+\s*[A-Za-z\s.]+$',
-      multiLine: true,
-    );
-    final nameMatches = nameRegex.allMatches(text);
-    if (nameMatches.isNotEmpty) {
-      // Collect all name matches and join them into a single string
-      extracted['Name'] = nameMatches.map((match) => match.group(0) ?? '').join(', ');
-    }
+    // final nameRegex = RegExp(
+    //   r'^(?:Mr\.?|Mrs\.?|Ms\.?|Dr\.?|Md\.?)?\s*[A-Za-z.]+\s*[A-Za-z\s.]+$',
+    //   multiLine: true,
+    // );
+    //
+    // final nameMatches = nameRegex.allMatches(text);
+    // if (nameMatches.isNotEmpty) {
+    //   List<String> matchedLines = nameMatches.map((match) => match.group(0) ?? '').toList();
+    //
+    //   if (matchedLines.isNotEmpty) {
+    //     // Assuming the first line is the company name
+    //     extracted['Company'] = matchedLines[0];
+    //
+    //     // If there are more than one matches, the second is assumed to be the person's name
+    //     if (matchedLines.length > 1) {
+    //       extracted['Name'] = matchedLines[1];
+    //     }
+    //
+    //     // If there are more than two matches, the third is assumed to be the designation
+    //     if (matchedLines.length > 2) {
+    //       extracted['Designation'] = matchedLines[2];
+    //     }
+    //   }
+    // }
 
     // Use a heuristic for address extraction (can be more sophisticated)
     final addressPattern = RegExp(r'[A-Za-z0-9.,\s-]+');
