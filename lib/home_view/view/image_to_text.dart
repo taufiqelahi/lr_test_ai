@@ -23,15 +23,16 @@ class _ImageToTextState extends State<ImageToText> {
       child: Scaffold(
         appBar: AppBar(
           actions: [
-            IconButton(onPressed: (){
-
-              setState(() {
-                controller.clear();
-                selectedImage=null;
-                savedText="";
-                extractedInfo={};
-              });
-            }, icon: Icon(Icons.refresh))
+            IconButton(
+                onPressed: () {
+                  setState(() {
+                    controller.clear();
+                    selectedImage = null;
+                    savedText = "";
+                    extractedInfo = {};
+                  });
+                },
+                icon: Icon(Icons.refresh))
           ],
         ),
         body: SingleChildScrollView(
@@ -39,14 +40,16 @@ class _ImageToTextState extends State<ImageToText> {
             children: [
               GestureDetector(
                 onTap: () async {
-                  final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                  final XFile? image =
+                      await picker.pickImage(source: ImageSource.camera);
                   if (image != null) {
                     String text = await getImageToText(image.path);
                     setState(() {
                       controller.text = text;
-                      print(text);// Put recognized text into the controller
+                      print(text); // Put recognized text into the controller
                       selectedImage = File(image.path);
-                      extractedInfo = extractDetails(text); // Extract details using regex
+                      extractedInfo =
+                          extractDetails(text); // Extract details using regex
                     });
                   }
                 },
@@ -60,11 +63,11 @@ class _ImageToTextState extends State<ImageToText> {
                   child: selectedImage != null
                       ? Image.file(selectedImage!)
                       : const Center(
-                    child: Icon(
-                      Icons.camera_alt,
-                      size: 50,
-                    ),
-                  ),
+                          child: Icon(
+                            Icons.camera_alt,
+                            size: 50,
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -80,7 +83,8 @@ class _ImageToTextState extends State<ImageToText> {
                 onPressed: () {
                   setState(() {
                     savedText = controller.text; // Save the controller text
-                    extractedInfo = extractDetails(savedText); // Re-extract details if edited
+                    extractedInfo = extractDetails(
+                        savedText); // Re-extract details if edited
                   });
                 },
                 child: const Text("Save"),
@@ -96,16 +100,16 @@ class _ImageToTextState extends State<ImageToText> {
                       children: [
                         selectedImage != null
                             ? Container(
-                          height: 100,
-                          width: 100,
-                          margin: const EdgeInsets.only(right: 15),
-                          child: Image.file(selectedImage!),
-                        )
+                                height: 100,
+                                width: 100,
+                                margin: const EdgeInsets.only(right: 15),
+                                child: Image.file(selectedImage!),
+                              )
                             : Container(
-                          height: 100,
-                          width: 100,
-                          color: Colors.grey,
-                        ),
+                                height: 100,
+                                width: 100,
+                                color: Colors.grey,
+                              ),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,6 +118,8 @@ class _ImageToTextState extends State<ImageToText> {
                                 Text("n ${extractedInfo['Name']}"),
                               if (extractedInfo['Company'] != null)
                                 Text("c ${extractedInfo['Company']}"),
+                              if (extractedInfo['Designation'] != null)
+                                Text("d ${extractedInfo['Designation']}"),
                               if (extractedInfo['Email'] != null)
                                 Text(" ${extractedInfo['Email']}"),
                               if (extractedInfo['Mobile'] != null)
@@ -141,50 +147,160 @@ class _ImageToTextState extends State<ImageToText> {
   Future<String> getImageToText(final imagePath) async {
     final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
     final RecognizedText recognizedText =
-    await textRecognizer.processImage(InputImage.fromFilePath(imagePath));
+        await textRecognizer.processImage(InputImage.fromFilePath(imagePath));
     return recognizedText.text;
   }
 
   // Function to extract structured info using regex
   Map<String, String> extractDetails(String text) {
-    final Map<String, String> extracted = {};
+    final lines = text
+        .split('\n')
+        .map((line) => line.trim())
+        .where((line) => line.isNotEmpty)
+        .toList();
 
-    // Regex for email
+    // Define extracted information map
+    Map<String, String> extracted = {};
 
-    final lines = text.split('\n').map((line) => line.trim()).where((line) => line.isNotEmpty).toList();
+    // Predefined lists for designations and company identifiers
+    List<String> designations = [
+      "CEO",
+      "Manager",
+      "HR",
+      "Software Developer",
+      "Developer",
+      "Engineer",
+      "Analyst",
+      "Consultant",
+      "Internal Audit",
+      "CTO",
+      "CFO",
+      "COO",
+      "Product Manager",
+      "Project Manager",
+      "Team Lead",
+      "UX/UI Designer",
+      "Data Scientist",
+      "Marketing Executive",
+      "Sales Executive",
+      "Business Analyst",
+      "Operations Manager",
+      "Customer Support",
+      "Legal Advisor",
+      "Network Administrator",
+      "Database Administrator",
+      "System Architect",
+      "Quality Assurance",
+      "Digital Marketing Specialist",
+      "Scrum Master",
+      "Content Writer",
+      "Financial Advisor"
+    ];
 
-    // Extract company name (first line)
-    if (lines.isNotEmpty) {
-      extracted['Company'] = lines[0];
+
+    List<String> companyKeywords = [
+      "Limited",
+      "Technologies",
+      "Telecom",
+      "Corporation",
+      "Trust",
+      "Inc.",
+      "LLC",
+      "Group",
+      "Holdings",
+      "Consulting",
+      "Solutions",
+      "Partners",
+      "Systems",
+      "Industries",
+      "Enterprise",
+      "Global",
+      "International",
+      "Ventures",
+      "Associates",
+      "Network",
+      "Services",
+      "Development",
+      "Media",
+      "Logistics",
+      "Resources",
+      "Software",
+      "Finance",
+      "Pharmaceuticals",
+      "Energy",
+      "Innovation",
+      "Capital",
+      "Centre"
+    ];
+
+
+    // Predefined list for name prefixes
+    List<String> namePrefixes = ["Mr.", "Mrs.", "Ms.", "Dr.", "Md.", "Mst."];
+
+    // Extract company name (if any line contains a company keyword)
+    for (var line in lines) {
+      if (companyKeywords.any(
+          (keyword) => line.toLowerCase().contains(keyword.toLowerCase()))&&!line.endsWith(".com")) {
+        extracted['Company'] = line;
+        break; // Company name found, break out of the loop
+      }
     }
 
-
-    // Consider all lines after the designation as potential name lines
+    // Regular expression for identifying potential names
     final nameRegex = RegExp(
-      r'^(?:Mr\.?|Mrs\.?|Ms\.?|Dr\.?|Md\.?)\s*[A-Za-z\s.]+(?:\s[A-Za-z\s.]+)*$',
+      r'^(?:Mr\.?|Mrs\.?|Ms\.?|Dr\.?|Md\.?|Mst\.?)?\s*[A-Za-z\s.]+(?:\s[A-Za-z\s.]+)*$',
       multiLine: true,
     );
 
-    // Find name in lines that are not likely to be contact info
-    final contactInfoPattern = RegExp(r'Tel|Mobile|Fax|E-mail|Global Dial|www');
-    final possibleNameLines = lines.where((line) => !contactInfoPattern.hasMatch(line)).toList();
-print("aaaaa${possibleNameLines}");
-    for (var line in possibleNameLines) {
-      final nameMatch = nameRegex.firstMatch(line);
-      print("baaaa${nameMatch}");
-      if (nameMatch != null) {
-        extracted['Name'] = nameMatch.group(0)?.trim() ?? '';
-        break; // Stop after finding the first valid name
-      }else{
-        extracted['Name'] = possibleNameLines[1];
+    // Extract designation and skip lines identified as company names
+    for (var line in lines) {
+      // Skip lines that are identified as company names
+      if (extracted['Company'] != null && extracted['Company'] == line) {
+        continue;
+      }
+
+      // Check for designation
+      if (extracted['Designation'] == null &&
+          designations.any((designation) =>
+              line.toLowerCase().contains(designation.toLowerCase()))) {
+        extracted['Designation'] = line;
+        continue;
       }
     }
-    final emailRegex = RegExp(r'\b[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b');
-    final emailMatch = emailRegex.firstMatch(text);
-    if (emailMatch != null) {
-      extracted['Email'] = emailMatch.group(0) ?? '';
-    }
 
+    // Extract the name
+    for (var line in lines) {
+      // Skip lines already identified as company or designation
+      if (line == extracted['Company'] || line == extracted['Designation']) {
+        continue;
+      }
+
+      // Check for name using prefix and regex
+      if (namePrefixes.any((prefix) =>
+              line.toLowerCase().startsWith(prefix.toLowerCase())) &&
+          nameRegex.hasMatch(line)) {
+        extracted['Name'] = line;
+        print("object$line");
+        break; // Stop after finding the first valid name
+      }
+    }
+    if(extracted['Name']==null){
+      for (var line in lines) {
+        // Skip lines already identified as company or designation
+        if (line == extracted['Company'] || line == extracted['Designation']) {
+          continue;
+        }
+
+        // Check for name using prefix and regex
+        if (extracted['Name'] == null && !designations.contains(line) && !companyKeywords.any((keyword) => line.contains(keyword))) {
+          if (nameRegex.hasMatch(line)) {
+            extracted['Name'] = line;
+            print("Match found for name without prefix: $line");
+            break;  // Stop after finding the first valid name
+          }
+        }
+      }
+    }
     // Regex for phone number (adjust based on the region)
     final phoneRegex = RegExp(
       r'(?:Phone|Mobile|Cell|Tel|Global Dial)?\s*:?(\+?\d{1,3}[\d\s\-]{7,}\d)',
@@ -241,7 +357,7 @@ print("aaaaa${possibleNameLines}");
     // Use a heuristic for address extraction (can be more sophisticated)
     final addressPattern = RegExp(r'[A-Za-z0-9.,\s-]+');
     extracted['Address'] = text.split('\n').lastWhere(
-            (line) => addressPattern.hasMatch(line),
+        (line) => addressPattern.hasMatch(line),
         orElse: () => 'Address not found');
 
     return extracted;
