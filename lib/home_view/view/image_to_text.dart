@@ -151,6 +151,7 @@ class _ImageToTextState extends State<ImageToText> {
     return recognizedText.text;
   }
 
+
   // Function to extract structured info using regex
   Map<String, String> extractDetails(String text) {
     final lines = text
@@ -232,6 +233,7 @@ class _ImageToTextState extends State<ImageToText> {
       "Capital",
       "Centre"
     ];
+
 
 
     // Predefined list for name prefixes
