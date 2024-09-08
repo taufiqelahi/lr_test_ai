@@ -25,8 +25,8 @@ class _VisitingCardAppState extends State<VisitingCardApp> {
   File? _image;
 
   Future<void> pickAndProcessImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? pickedImage = await _picker.pickImage(source: ImageSource.camera);
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedImage = await picker.pickImage(source: ImageSource.camera);
 
     if (pickedImage != null) {
       File imageFile = File(pickedImage.path);  // Convert XFile to File

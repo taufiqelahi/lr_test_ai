@@ -101,7 +101,6 @@ class _AutoCaptureScreenState extends State<AutoCaptureScreen> {
         });
 
         // Debug print to verify image capture
-        print('Image captured: ${imageFile.path}');
       } catch (e) {
         print('Error capturing image: $e');
       } finally {

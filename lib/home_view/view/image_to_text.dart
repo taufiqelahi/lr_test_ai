@@ -32,7 +32,7 @@ class _ImageToTextState extends State<ImageToText> {
                     extractedInfo = {};
                   });
                 },
-                icon: Icon(Icons.refresh))
+                icon: const Icon(Icons.refresh))
           ],
         ),
         body: SingleChildScrollView(
