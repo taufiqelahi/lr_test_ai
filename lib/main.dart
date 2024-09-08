@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:testai/home_view/home_view.dart';
-import 'package:testai/home_view/resize_image.dart';
 import 'package:testai/home_view/view/auto_capture.dart';
 import 'package:testai/home_view/view/image_to_text.dart';
 import 'package:testai/home_view/view/voice_view.dart';
@@ -36,7 +35,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const VisitingCardApp()
+      home: const ImageToText()
     );
   }
 }
