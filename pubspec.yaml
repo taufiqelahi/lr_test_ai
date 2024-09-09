@@ -45,6 +45,7 @@ dependencies:
   google_mlkit_object_detection: ^0.13.0
   flutter_image_compress: ^2.3.0
   path_provider: ^2.1.4
+  image_cropper: ^8.0.2
 
 
 dev_dependencies:

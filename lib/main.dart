@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:testai/home_view/camera_option/camera_screen.dart';
 import 'package:testai/home_view/home_view.dart';
 import 'package:testai/home_view/view/auto_capture.dart';
 import 'package:testai/home_view/view/image_to_text.dart';
@@ -14,7 +15,9 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -35,7 +38,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const ImageToText()
+      home:  CameraCaptureScreen()
     );
   }
 }
