@@ -10,7 +10,7 @@ class DisplayCapturedImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Captured Image')),
+      appBar: AppBar(title: const Text('Captured Image')),
       body: Column(
         children: [
           Image.file(File(imagePath)),
@@ -23,7 +23,7 @@ class DisplayCapturedImage extends StatelessWidget {
                 sourcePath: imagePath,
                 compressFormat: ImageCompressFormat.jpg,
                 compressQuality: 90,
-                aspectRatio: CropAspectRatio(ratioX: 5, ratioY: 3), // Custom aspect ratio
+                aspectRatio: const CropAspectRatio(ratioX: 5, ratioY: 3), // Custom aspect ratio
                 uiSettings: [
                   AndroidUiSettings(
                     toolbarTitle: 'Cropper',
@@ -53,7 +53,7 @@ class DisplayCapturedImage extends StatelessWidget {
                 );
               }
             },
-            child: Text('Crop Visiting Card'),
+            child: const Text('Crop Visiting Card'),
           ),
         ],
       ),
@@ -69,7 +69,7 @@ class DisplayCroppedImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Cropped Image')),
+      appBar: AppBar(title: const Text('Cropped Image')),
       body: Center(child: Image.file(File(croppedImagePath))),
     );
   }

@@ -50,12 +50,12 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Capture Visiting Card')),
+      appBar: AppBar(title: const Text('Capture Visiting Card')),
       body: _isCameraInitialized
           ? Center(
             child: CameraPreview(_cameraController!),
           )
-          : Center(child: CircularProgressIndicator()),
+          : const Center(child: CircularProgressIndicator()),
       floatingActionButton: FloatingActionButton(
         onPressed: ()async{
           if (_cameraController == null || !_cameraController!.value.isInitialized) {
@@ -69,7 +69,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
             // Crop the image automatically to the visiting card size (5:3 ratio)
             CroppedFile? croppedFile = await ImageCropper().cropImage(
               sourcePath: imageFile.path,
-              aspectRatio: CropAspectRatio(ratioX: 5, ratioY: 3), // Custom aspect ratio for visiting card
+              aspectRatio: const CropAspectRatio(ratioX: 5, ratioY: 3), // Custom aspect ratio for visiting card
               compressFormat: ImageCompressFormat.jpg,
               compressQuality: 90,
               uiSettings: [
@@ -101,7 +101,7 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
             print('Error capturing or cropping image: $e');
           }
         },
-        child: Icon(Icons.camera),
+        child: const Icon(Icons.camera),
       ),
     );
   }
@@ -115,7 +115,7 @@ class DisplayCroppedImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Cropped Image')),
+      appBar: AppBar(title: const Text('Cropped Image')),
       body: Center(child: Image.file(File(croppedImagePath))),
     );
   }
