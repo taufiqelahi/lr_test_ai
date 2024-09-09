@@ -95,9 +95,9 @@ class _AutoCaptureScreenState extends State<AutoCaptureScreen> {
         XFile imageFile = await _cameraController!.takePicture();
 
         setState(() {
-          _capturedImage = imageFile; // Save the captured image
-          _isTextDetected = false; // Reset text detected flag
-          _isStreamStopped = true; // Stop further processing
+          _capturedImage = imageFile;
+          _isTextDetected = false;
+          _isStreamStopped = true;
         });
 
         // Debug print to verify image capture
@@ -105,7 +105,7 @@ class _AutoCaptureScreenState extends State<AutoCaptureScreen> {
         print('Error capturing image: $e');
       } finally {
         _isCapturing = false;
-        await _cameraController?.dispose(); // Dispose camera controller
+        await _cameraController?.dispose();
       }
     }
   }
@@ -138,7 +138,7 @@ class _AutoCaptureScreenState extends State<AutoCaptureScreen> {
                 ),
               ),
             ),
-          if (_capturedImage != null) // Display the captured image
+          if (_capturedImage != null)
             Center(
               child: Container(
                 width: double.infinity,
@@ -151,10 +151,9 @@ class _AutoCaptureScreenState extends State<AutoCaptureScreen> {
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          _capturedImage = null; // Reset captured image to continue detection
-                          _isStreamStopped = false; // Reset stream status
+                          _capturedImage = null;
+                          _isStreamStopped = false;
                         });
-                        // Reinitialize the camera and start the image stream
                         _initializeCamera();
                       },
                       child: const Text('Capture Again'),
