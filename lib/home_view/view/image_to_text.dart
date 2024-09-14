@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:google_mlkit_entity_extraction/google_mlkit_entity_extraction.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -15,7 +16,8 @@ class _ImageToTextState extends State<ImageToText> {
   File? selectedImage;
   final TextEditingController controller = TextEditingController();
   String savedText = ""; // Store the saved text
-  Map<String, String> extractedInfo = {}; // To store structured data
+  Map<String, String> extractedInfo = {};
+  String email="";// To store structured data
 
   @override
   Widget build(BuildContext context) {
@@ -44,12 +46,16 @@ class _ImageToTextState extends State<ImageToText> {
                       await picker.pickImage(source: ImageSource.camera);
                   if (image != null) {
                     String text = await getImageToText(image.path);
+                    await findEmail(text);
                     setState(() {
                       controller.text = text;
                       print(text); // Put recognized text into the controller
                       selectedImage = File(image.path);
+
                       extractedInfo =
                           extractDetails(text); // Extract details using regex
+                      extractedInfo["Address"]=email;
+
                     });
                   }
                 },
@@ -130,6 +136,7 @@ class _ImageToTextState extends State<ImageToText> {
                                 Text(" ${extractedInfo['Phone']}"),
                               if (extractedInfo['Address'] != null)
                                 Text(" ${extractedInfo['Address']}"),
+                              Text(email)
                             ],
                           ),
                         ),
@@ -150,7 +157,6 @@ class _ImageToTextState extends State<ImageToText> {
         await textRecognizer.processImage(InputImage.fromFilePath(imagePath));
     return recognizedText.text;
   }
-
 
   // Function to extract structured info using regex
   Map<String, String> extractDetails(String text) {
@@ -198,7 +204,6 @@ class _ImageToTextState extends State<ImageToText> {
       "Financial Advisor"
     ];
 
-
     List<String> companyKeywords = [
       "Limited",
       "Technologies",
@@ -234,15 +239,14 @@ class _ImageToTextState extends State<ImageToText> {
       "Centre"
     ];
 
-
-
     // Predefined list for name prefixes
     List<String> namePrefixes = ["Mr.", "Mrs.", "Ms.", "Dr.", "Md.", "Mst."];
 
     // Extract company name (if any line contains a company keyword)
     for (var line in lines) {
-      if (companyKeywords.any(
-          (keyword) => line.toLowerCase().contains(keyword.toLowerCase()))&&!line.endsWith(".com")) {
+      if (companyKeywords.any((keyword) =>
+              line.toLowerCase().contains(keyword.toLowerCase())) &&
+          !line.endsWith(".com")) {
         extracted['Company'] = line;
         break; // Company name found, break out of the loop
       }
@@ -286,7 +290,18 @@ class _ImageToTextState extends State<ImageToText> {
         break; // Stop after finding the first valid name
       }
     }
-    if(extracted['Name']==null){
+    final emailRegex =
+        RegExp(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}');
+    final emailMatch = emailRegex.firstMatch(text);
+
+    if (emailMatch != null) {
+      extracted["Email"] = emailMatch.group(0) ?? '';
+      print('Extracted Email: ${emailMatch.group(0)}');
+    } else {
+      extracted["Email"] = '';
+      print('No email found in the text.');
+    }
+    if (extracted['Name'] == null) {
       for (var line in lines) {
         // Skip lines already identified as company or designation
         if (line == extracted['Company'] || line == extracted['Designation']) {
@@ -294,11 +309,13 @@ class _ImageToTextState extends State<ImageToText> {
         }
 
         // Check for name using prefix and regex
-        if (extracted['Name'] == null && !designations.contains(line) && !companyKeywords.any((keyword) => line.contains(keyword))) {
+        if (extracted['Name'] == null &&
+            !designations.contains(line) &&
+            !companyKeywords.any((keyword) => line.contains(keyword))) {
           if (nameRegex.hasMatch(line)) {
             extracted['Name'] = line;
             print("Match found for name without prefix: $line");
-            break;  // Stop after finding the first valid name
+            break; // Stop after finding the first valid name
           }
         }
       }
@@ -356,12 +373,53 @@ class _ImageToTextState extends State<ImageToText> {
     //   }
     // }
 
-    // Use a heuristic for address extraction (can be more sophisticated)
-    final addressPattern = RegExp(r'[A-Za-z0-9.,\s-]+');
-    extracted['Address'] = text.split('\n').lastWhere(
-        (line) => addressPattern.hasMatch(line),
-        orElse: () => 'Address not found');
+    // // Use a heuristic for address extraction (can be more sophisticated)
+    // final addressPattern = RegExp(r'[A-Za-z0-9.,\s-]+');
+    // extracted['Address'] = text.split('\n').lastWhere(
+    //     (line) => addressPattern.hasMatch(line),
+    //     orElse: () => 'Address not found');
 
     return extracted;
+  }
+
+  Future<void> findEmail(String text) async {
+    final entityExtractor =
+        EntityExtractor(language: EntityExtractorLanguage.english);
+
+    try {
+      // Annotate the text and get all the entities
+      final List<EntityAnnotation> annotations =
+          await entityExtractor.annotateText(text);
+
+      // Check if any annotations were returned
+      if (annotations.isEmpty) {
+        print("No annotations found in the text.");
+        return;
+      }
+
+      for (final annotation in annotations) {
+        print("Annotation found: ${annotation.text}");
+
+        for (final entity in annotation.entities) {
+          print("Entity type: ${entity.type}, rawValue: ${entity.rawValue}");
+
+          if (entity.type == EntityType.email) {
+            // Print the extracted email
+            print("Extracted Email: ${entity.rawValue}");
+          }
+          if (entity.type == EntityType.address) {
+            email = annotation.text;
+            print("aaaaaaaaaaaaa${extractedInfo['Address']}");
+            // Print the extracted email
+            print("Extracted adress: ${annotation.text}");
+          }
+        }
+      }
+    } catch (e) {
+      print("Error occurred: $e");
+    } finally {
+      // Always close the entity extractor when you're done
+      await entityExtractor.close();
+    }
   }
 }

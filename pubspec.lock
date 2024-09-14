@@ -248,6 +248,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.1"
+  google_mlkit_entity_extraction:
+    dependency: "direct main"
+    description:
+      name: google_mlkit_entity_extraction
+      sha256: "38f5ccc38a93a3be45383a13bf45b42c14f88fe45be6ce1e051fdc820345684d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.13.0"
   google_mlkit_object_detection:
     dependency: "direct main"
     description:
