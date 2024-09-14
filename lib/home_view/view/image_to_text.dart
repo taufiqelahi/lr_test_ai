@@ -18,7 +18,7 @@ class _ImageToTextState extends State<ImageToText> {
   String savedText = ""; // Store the saved text
   Map<String, String> extractedInfo = {};
   String email="";// To store structured data
-
+String address="";
   @override
   Widget build(BuildContext context) {
     return SafeArea(
