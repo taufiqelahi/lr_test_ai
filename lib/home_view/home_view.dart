@@ -21,6 +21,7 @@ class _HomeViewState extends State<HomeView> {
     super.initState();
     filteredItems = users;
   }
+
   void _filterList(String query) async {
     setState(() {
       List<String> keywords = query.toLowerCase().split(' ');

@@ -47,6 +47,7 @@ dependencies:
   path_provider: ^2.1.4
   image_cropper: ^8.0.2
   google_mlkit_entity_extraction: ^0.13.0
+  cunning_document_scanner: ^1.2.3
 
 
 dev_dependencies:

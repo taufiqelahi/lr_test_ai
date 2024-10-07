@@ -1,44 +1,73 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:testai/home_view/camera_option/camera_screen.dart';
-import 'package:testai/home_view/home_view.dart';
-import 'package:testai/home_view/view/auto_capture.dart';
-import 'package:testai/home_view/view/image_to_text.dart';
-import 'package:testai/home_view/view/voice_view.dart';
+import 'dart:async';
+import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  String? _scannedPicturePath;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
     return MaterialApp(
-      navigatorKey: navigatorKey,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Document Scanner App'),
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              ElevatedButton(
+                onPressed: onPressed,
+                child: const Text("Scan Picture"),
+              ),
+              if (_scannedPicturePath != null)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Text('Scanned Picture Path: $_scannedPicturePath'),
+                      Image.file(File(_scannedPicturePath!)),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
-      home:  ImageToText()
     );
+  }
+
+  void onPressed() async {
+    try {
+      // Get a single scanned picture
+      List<String> pictures = await CunningDocumentScanner.getPictures() ?? [];
+
+      // We assume you're scanning just one picture, so take the first one
+      if (pictures.isNotEmpty) {
+        setState(() {
+          _scannedPicturePath = pictures.first;
+        });
+      }
+    } catch (exception) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to capture image: $exception')),
+      );
+    }
   }
 }
